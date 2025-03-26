@@ -22,6 +22,7 @@ public class Main {
     // This method is called after a successful login or account creation.
     // It loads the user's data (or creates a new DataManager if none exists) and opens the Lobby.
     public static void afterLogin(String username) {
+        // load highest wave and characters
         currentUsername = username;
         String filePath = username + "_data.dat";
         try {
