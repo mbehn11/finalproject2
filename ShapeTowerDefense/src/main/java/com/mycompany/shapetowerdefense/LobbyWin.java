@@ -5,22 +5,36 @@
 package com.mycompany.shapetowerdefense;
 
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author behnf
  */
 public class LobbyWin extends javax.swing.JFrame {
+    DataManager dm = DataManager.getInstance();
+    private DefaultTableModel equippedListModel;
     /**
      * Creates new form Lobby
      */
     public LobbyWin() {
         initComponents();
-        usernameLabel.setText("User: " + Main.currentUsername);
-        goldLabel.setText("Gold: " + Main.dataManager.getGold());
-        waveLabel.setText("Highest Wave: " + Main.dataManager.getHighestWave());
+        usernameLabel.setText("User: " + dm.getUsername());
+        goldLabel.setText("💰Gold: " + dm.getGold()); // always 100
+        waveLabel.setText("👑Highest Wave: " + dm.getHighestWave()); // always 0
+        equippedListModel = new DefaultTableModel(new String[]{"Equipped Characters"}, 0); // always empty when first loaded
+        equippedList.setModel(equippedListModel);
+        loadEquippedUnits();
     }
     
+    private void loadEquippedUnits() {
+        // Should only load into my inventory I have to equip manually
+        equippedListModel.setRowCount(0);
+        for (ShapeCharacter sc : dm.getEquippedUnits()) {
+            equippedListModel.addRow(new Object[]{sc.getShapeType()});
+        }
+    }
     // Load into the equippedList so the user sees 
 
     /**
@@ -46,26 +60,27 @@ public class LobbyWin extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         equippedList = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        goToSplashScreen = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(0, 153, 153));
 
-        playButton.setText("Play");
+        playButton.setText("Play➤");
         playButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 playButtonActionPerformed(evt);
             }
         });
 
-        shopButton.setText("Shop");
+        shopButton.setText("🛒Shop");
         shopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 shopButtonActionPerformed(evt);
             }
         });
 
-        inventoryButton.setText("Inventory");
+        inventoryButton.setText("📦Inventory");
         inventoryButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inventoryButtonActionPerformed(evt);
@@ -183,6 +198,13 @@ public class LobbyWin extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Equipped List");
 
+        goToSplashScreen.setText("⏪Log Out");
+        goToSplashScreen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                goToSplashScreenActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -197,15 +219,17 @@ public class LobbyWin extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(shopButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(inventoryButton, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
-                            .addComponent(playButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(goToSplashScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(24, 24, 24))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(playButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(94, 94, 94))))))
+                                .addGap(79, 79, 79))))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,17 +237,20 @@ public class LobbyWin extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(inventoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(shopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(goToSplashScreen, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(inventoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(shopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(7, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -249,8 +276,13 @@ public class LobbyWin extends javax.swing.JFrame {
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
 //        ArrayList<ShapeCharacter> equippedUnits = Main.dataManager.getEquippedUnits(); // Get equipped characters
         // Check if character amount is atleast 1 before playing
-        new BattleWin().setVisible(true); // Pass them to BattleWin
-        dispose(); //
+        if(dm.getUnitCount() > 0){
+            new BattleWin().setVisible(true); // Pass them to BattleWin
+            dispose(); 
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "Need to have atleast 1 character to play"); // add title to message
+        }
     }//GEN-LAST:event_playButtonActionPerformed
 
     private void shopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shopButtonActionPerformed
@@ -262,6 +294,21 @@ public class LobbyWin extends javax.swing.JFrame {
         new InventoryWin().setVisible(true);
                 dispose();
     }//GEN-LAST:event_inventoryButtonActionPerformed
+
+    private void goToSplashScreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToSplashScreenActionPerformed
+        int choice = JOptionPane.showConfirmDialog(
+        this,
+        "Are you sure you want to log out? You'll be returned to the main screen.",
+        "Confirm Logout",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            new SplashScreen().setVisible(true);
+            dispose();
+        }
+    }//GEN-LAST:event_goToSplashScreenActionPerformed
 
     /**
      * @param args the command line arguments
@@ -301,6 +348,7 @@ public class LobbyWin extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable equippedList;
+    private javax.swing.JButton goToSplashScreen;
     private javax.swing.JLabel goldLabel;
     private javax.swing.JPanel goldLabelPanel;
     private javax.swing.JButton inventoryButton;

@@ -6,26 +6,51 @@ package com.mycompany.shapetowerdefense;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
+import javax.swing.JOptionPane;
 
 // Singleton Approach
 // Main has access to DataManager which means every class can use Main.DataManager to access anything
+// TODO:::::::::::::::::::::::::
+// add icons for message pop ups( Inventory, gold, shop, play ) // started
+// change battleWin button texts // done
+// fix loading and saving data it seems to keep making a new dataManager instance // confused
+// inventory broken with amount of characters equipped // done
+// fix battlewin character placements // done
+// fix food bug in battleWin // done
+// add highscore api // confused
+// Try redrawing on only region that needs to redraw
+// :::::::::::::::::::::::::::::
 public class DataManager implements Serializable {
     private static final long serialVersionUID = 1L;
-
+    private static DataManager instance;
+    private static String currentFilePath;
+    private String currentUsername;
     private int gold;
     private double foodGenerationMultiplier = 1.0;
     public int highestWave;
     private ArrayList<ShapeCharacter> equippedUnits;
+    private int UnitsCount = 0;
     private ArrayList<ShapeCharacter> inventoryUnits; // Added inventory units
-    private HashMap<String, ShapeCharacter> characterMap; // Added character map because Jlists/Tables are Strings
 
     public DataManager() {
         gold = 100;
         highestWave = 0;
         equippedUnits = new ArrayList<>();
         inventoryUnits = new ArrayList<>(); // Initialize inventory units
-        characterMap = new HashMap<>(); // Initialize character map
+    }
+    
+    // Singleton Accessor
+    public static synchronized DataManager getInstance() {
+        if (instance == null) {
+            // If no file path set, create new instance
+            if (currentFilePath == null) {
+                instance = new DataManager();
+            } else {
+                // Try to load from file, fall back to new instance
+                instance = loadFromFile(currentFilePath);
+            }
+        }
+        return instance;
     }
 
     // Unit methods
@@ -39,14 +64,23 @@ public class DataManager implements Serializable {
 
     public void addShape(ShapeCharacter shape) {
         equippedUnits.add(shape);
-        inventoryUnits.add(shape); // Add shape to inventory
-        characterMap.put(shape.getName(), shape); // Add to map
+        inventoryUnits.add(shape);
+        saveToFile(currentFilePath);
     }
 
     public void setEquippedUnits(ArrayList<ShapeCharacter> units) {
         if (units.size() <= 3) {
             this.equippedUnits = new ArrayList<>(units);
         }
+        saveToFile(currentFilePath);
+    }
+    
+    public int addUnitCount(int count) {
+        return this.UnitsCount += count;
+    }
+    
+    public int getUnitCount() {
+        return this.UnitsCount;
     }
 
     // Food Generation 
@@ -57,12 +91,14 @@ public class DataManager implements Serializable {
 
     public void upgradeFoodGenerationMultiplier(double amount) {
         foodGenerationMultiplier += amount;
+        saveToFile(currentFilePath);
     }
     
     // Gold Methods
     public boolean spendGold(int amount) {
         if (gold >= amount) {
             gold -= amount;
+            saveToFile(currentFilePath);
             return true;
         }
         return false;
@@ -70,6 +106,7 @@ public class DataManager implements Serializable {
 
     public void addGold(int amount) {
         gold += amount;
+        saveToFile(currentFilePath);
     }
 
     // Getters and setters
@@ -87,36 +124,99 @@ public class DataManager implements Serializable {
 
     public void setHighestWave(int wave) {
         this.highestWave = wave;
+        saveToFile(currentFilePath);
     }
 
-    // Character map method
     public ShapeCharacter getCharacterByName(String name) {
-        return characterMap.get(name);
+        for (ShapeCharacter sc : inventoryUnits) {
+            if (sc.getShapeType().equals(name)) {
+                return sc;
+            }
+        }
+        return null;
+    }
+    
+    public String getUsername() { 
+        return currentUsername;
     }
 
-    // Save this DataManager to a file using serialization
-    public void saveToFile(String filePath) throws IOException {
+    public void setUsername(String username) {
+        this.currentUsername = username;
+    }
+
+    public void saveToFile(String filePath) {
+        if (filePath == null) return;
+
+        FileOutputStream fileOut = null;
         ObjectOutputStream out = null;
         try {
-            out = new ObjectOutputStream(new FileOutputStream(filePath));
+            fileOut = new FileOutputStream(filePath);
+            out = new ObjectOutputStream(fileOut);
             out.writeObject(this);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Failed to save game", "Error", JOptionPane.ERROR_MESSAGE);
         } finally {
-            if (out != null) out.close();
+            try {
+                if (out != null) out.close();
+                if (fileOut != null) fileOut.close();
+            } catch (IOException e) {
+                System.err.println("Error closing streams: " + e.getMessage());
+            }
         }
     }
 
-    // Load a DataManager from file; if the file doesn't exist, return a new instance
-    public static DataManager loadFromFile(String filePath) throws IOException, ClassNotFoundException {
-        File f = new File(filePath);
-        if (!f.exists()) {
-            return new DataManager();
+    private static DataManager loadFromFile(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists() || file.length() == 0) {
+            return null;
         }
+
+        FileInputStream fileIn = null;
         ObjectInputStream in = null;
         try {
-            in = new ObjectInputStream(new FileInputStream(filePath));
+            fileIn = new FileInputStream(file);
+            in = new ObjectInputStream(fileIn);
             return (DataManager) in.readObject();
+        } catch (Exception e) {
+            return null;
         } finally {
-            if (in != null) in.close();
+            try {
+                if (in != null) in.close();
+                if (fileIn != null) fileIn.close();
+            } catch (IOException e) {
+                System.err.println("Error closing streams: " + e.getMessage());
+            }
         }
+    }
+
+
+
+    public void login(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+
+        currentFilePath = username + "_data.dat";
+        File file = new File(currentFilePath);
+
+        if (file.exists() && file.length() > 0) {
+            DataManager loadedData = loadFromFile(currentFilePath);
+            if (loadedData != null) {
+                this.copyFrom(loadedData);
+            }
+        }
+
+        this.setUsername(username);
+        this.saveToFile(currentFilePath);
+        new LobbyWin().setVisible(true);
+    }
+
+    private void copyFrom(DataManager source) {
+        this.gold = source.gold;
+        this.highestWave = source.highestWave;
+        this.equippedUnits = new ArrayList<>(source.equippedUnits);
+        this.inventoryUnits = new ArrayList<>(source.inventoryUnits);
+        this.foodGenerationMultiplier = source.foodGenerationMultiplier;
+        this.UnitsCount = source.UnitsCount;
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.8" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Container class="javax.swing.JScrollPane" name="jScrollPane3">
       <AuxValues>
@@ -76,12 +76,12 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jScrollPane1" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="goToLobby" alignment="0" pref="92" max="32767" attributes="0"/>
-                              <Component id="equipButton" alignment="0" max="32767" attributes="0"/>
-                              <Component id="goToShop" alignment="0" max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="equipButton" max="32767" attributes="0"/>
+                              <Component id="goToLobby" pref="150" max="32767" attributes="0"/>
+                              <Component id="goToShop" max="32767" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="70" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jScrollPane4" min="-2" pref="242" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -108,16 +108,16 @@
                   <Component id="jScrollPane1" min="-2" pref="91" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="equipButton" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="goToLobby" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="goToShop" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jScrollPane4" min="-2" pref="130" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Component id="equipButton" min="-2" pref="38" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="goToLobby" min="-2" pref="39" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="goToShop" min="-2" pref="41" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -202,7 +202,7 @@
         </Container>
         <Component class="javax.swing.JButton" name="goToShop">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Shop"/>
+            <Property name="text" type="java.lang.String" value="\ud83d\uded2Shop" containsInvalidXMLChars="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="goToShopActionPerformed"/>
@@ -210,7 +210,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="goToLobby">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Lobby"/>
+            <Property name="text" type="java.lang.String" value="\ud83c\udfe0Lobby" containsInvalidXMLChars="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="goToLobbyActionPerformed"/>

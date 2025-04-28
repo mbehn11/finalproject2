@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
  * @author behnf
  */
 public class ShopWin extends javax.swing.JFrame {
+    DataManager dm = DataManager.getInstance();
     private DefaultListModel inventoryModel;
     private ArrayList<ShapeCharacter> allCharacters;
     private Random random;
@@ -29,47 +30,83 @@ public class ShopWin extends javax.swing.JFrame {
     }
     
     private void buyCharacter() {
-        if (!Main.dataManager.spendGold(50)) {
-        JOptionPane.showMessageDialog(this, "Not enough coins!");
-        return;
-    }
+        if (!dm.spendGold(50)) {
+            JOptionPane.showMessageDialog(this, "Not enough coins!");
+            return;
+        }
 
-    ShapeCharacter newCharacter = allCharacters.get(random.nextInt(allCharacters.size()));
+        // Defined rarity weights
+        // Total: 100
+        int commonWeight = 40;
+        int uncommonWeight = 65;
+        int rareWeight = 80;
+        int epicWeight = 90;
+        int legendaryWeight = 97;
+        int mythicWeight = 100;
 
-    if (inventoryModel.contains(newCharacter)) {
-        Main.dataManager.addGold(25);
-        JOptionPane.showMessageDialog(this, "Duplicate! Refunding 25 coins.");
-    } else {
-        inventoryModel.addElement(newCharacter);
-        JOptionPane.showMessageDialog(this, "You unlocked: " + newCharacter.getName());
-        Main.dataManager.addShape(newCharacter);
-        // Update labels with the new character's information
-        rarietyLabel.setText("Rarity: " + newCharacter.getRarity()); 
-        nameLabel.setText("Name: " + newCharacter.getName());
-        healthLabel.setText("Health: " + newCharacter.getHealth());
-        damageLabel.setText("Damage: " + newCharacter.getDamage());
-    }
+        // Pick a rarity based on weights
+        int roll = random.nextInt(100); // 0-99
+        String selectedRarity;
+        if (roll < commonWeight) {
+            selectedRarity = "Common";
+        } else if (roll < uncommonWeight) {
+            selectedRarity = "Uncommon";
+        } else if (roll < rareWeight) {
+            selectedRarity = "Rare";
+        } else if (roll < epicWeight) {
+            selectedRarity = "Epic";
+        } else if (roll < legendaryWeight) {
+            selectedRarity = "Legendary";
+        } else {
+            selectedRarity = "Mythic";
+        }
 
-    updateCoinsLabel();
+        // Filter characters based on selected rarity
+        ArrayList<ShapeCharacter> filteredByRarity = new ArrayList<>();
+        for (ShapeCharacter character : allCharacters) {
+            if (character.getRarity().equalsIgnoreCase(selectedRarity)) {
+                filteredByRarity.add(character);
+            }
+        }
+
+        // Pick a character randomly from that rarity pool
+        ShapeCharacter newCharacter = filteredByRarity.get(random.nextInt(filteredByRarity.size()));
+
+        if (inventoryModel.contains(newCharacter)) {
+            dm.addGold(25);
+            JOptionPane.showMessageDialog(this, "Duplicate! Refunding 25 coins.");
+        } else {
+            inventoryModel.addElement(newCharacter);
+            JOptionPane.showMessageDialog(this, "You unlocked: " + newCharacter.getName());
+            dm.addUnitCount(1);
+            dm.addShape(newCharacter);
+
+            rarietyLabel.setText("Rarity: " + newCharacter.getRarity());
+            nameLabel.setText("Name: " + newCharacter.getName());
+            healthLabel.setText("Health: " + newCharacter.getHealth());
+            damageLabel.setText("Damage: " + newCharacter.getDamage());
+        }
+
+        updateCoinsLabel();
     }
     
     private void upgradeFoodGeneration() {
-        int upgradeCost = 150; // Set upgrade cost
+        int upgradeCost = 125; // Set upgrade cost
 
-        if (!Main.dataManager.spendGold(upgradeCost)) {
+        if (!dm.spendGold(upgradeCost)) {
             JOptionPane.showMessageDialog(this, "Not enough coins!");
             return;
         }
 
         double upgradeAmount = 0.5; // Set upgrade amount
-        Main.dataManager.upgradeFoodGenerationMultiplier(upgradeAmount);
+        dm.upgradeFoodGenerationMultiplier(upgradeAmount);
 
-        generationLabel.setText("Generation Multiplier: " + Main.dataManager.getFoodGenerationMultiplier());
+        generationLabel.setText("Generation Multiplier: " + dm.getFoodGenerationMultiplier());
         updateCoinsLabel();
     }
     
     private void updateCoinsLabel() {
-        goldLabel.setText("Coins: " + Main.dataManager.getGold());
+        goldLabel.setText("Coins: " + dm.getGold());
     }
     
     /**
@@ -87,6 +124,7 @@ public class ShopWin extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         toInventoryButton = new javax.swing.JButton();
         goldLabel = new javax.swing.JLabel();
+        toLobbyButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         rarietyLabel = new javax.swing.JLabel();
         nameLabel = new javax.swing.JLabel();
@@ -99,28 +137,35 @@ public class ShopWin extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 102, 102));
 
-        buyButton.setText("Buy Character");
+        buyButton.setText("💰Buy Character(50)");
         buyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buyButtonActionPerformed(evt);
             }
         });
 
-        upgradeFoodButton.setText("Upgrade Food Generation");
+        upgradeFoodButton.setText("💰Upgrade Food Generation(125)");
         upgradeFoodButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upgradeFoodButtonActionPerformed(evt);
             }
         });
 
-        toInventoryButton.setText("Inventory");
+        toInventoryButton.setText("📦Inventory");
         toInventoryButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 toInventoryButtonActionPerformed(evt);
             }
         });
 
-        goldLabel.setText("Gold:");
+        goldLabel.setText("💰Gold:");
+
+        toLobbyButton.setText("🏠Lobby");
+        toLobbyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                toLobbyButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -131,6 +176,8 @@ public class ShopWin extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(toInventoryButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(toLobbyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(goldLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -139,10 +186,12 @@ public class ShopWin extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(toInventoryButton)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(toInventoryButton)
+                    .addComponent(toLobbyButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(goldLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         rarietyLabel.setText("Rariety:");
@@ -177,7 +226,7 @@ public class ShopWin extends javax.swing.JFrame {
                 .addComponent(healthLabel)
                 .addGap(12, 12, 12)
                 .addComponent(damageLabel)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(47, Short.MAX_VALUE))
         );
 
         generationLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -224,14 +273,14 @@ public class ShopWin extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buyButton)
-                    .addComponent(upgradeFoodButton))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(buyButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                    .addComponent(upgradeFoodButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(17, Short.MAX_VALUE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -260,6 +309,11 @@ public class ShopWin extends javax.swing.JFrame {
     private void upgradeFoodButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upgradeFoodButtonActionPerformed
         upgradeFoodGeneration();
     }//GEN-LAST:event_upgradeFoodButtonActionPerformed
+
+    private void toLobbyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toLobbyButtonActionPerformed
+        new LobbyWin().setVisible(true);
+                dispose();
+    }//GEN-LAST:event_toLobbyButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -310,6 +364,7 @@ public class ShopWin extends javax.swing.JFrame {
     private javax.swing.JLabel nameLabel;
     private javax.swing.JLabel rarietyLabel;
     private javax.swing.JButton toInventoryButton;
+    private javax.swing.JButton toLobbyButton;
     private javax.swing.JButton upgradeFoodButton;
     // End of variables declaration//GEN-END:variables
 }

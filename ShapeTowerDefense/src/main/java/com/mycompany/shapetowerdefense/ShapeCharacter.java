@@ -4,17 +4,16 @@
  */
 package com.mycompany.shapetowerdefense;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-public class ShapeCharacter extends Unit {
-    private String name;
+public class ShapeCharacter extends Unit implements Serializable {
+    private static final long serialVersionUID = 1L; 
     private String rarity;
     private int cost;
 
-    public ShapeCharacter(String name, String rarity, String shapeType, int x, int y, int health, int damage, int speed, int width, int height, int cost) {
+    public ShapeCharacter(String shapeType, String rarity, int x, int y, int health, int damage, int speed, int width, int height, int cost) {
         super(x, y, health, damage, speed, width, height, shapeType);
-        this.name = name;
         this.rarity = rarity;
         this.cost = cost;
     }
@@ -24,16 +23,27 @@ public class ShapeCharacter extends Unit {
         x += speed; // Moves right toward enemy
     }
 
-    public String getName() { return name; }
+    public String getName() { return shapeType; }
     public String getRarity() { return rarity; }
     public int getCost() { return cost; }
 
-    public static ArrayList<ShapeCharacter> getAllShapes() {
-        // make this a shared thing between Unit
-        return new ArrayList<>(Arrays.asList(
-            new ShapeCharacter("Circle", "Common", "Circle", 50, 300, 100, 15, 2, 30, 30, 5),
-            new ShapeCharacter("Square", "Uncommon", "Square", 50, 300, 80, 20, 3, 30, 30, 7),
-            new ShapeCharacter("Rectangle", "Rare", "Rectangle", 50, 300, 60, 25, 2, 40, 20, 10)
-        ));
+    public static ArrayList<ShapeCharacter> getAllShapes() { 
+        ArrayList<ShapeCharacter> allShapes = new ArrayList<>();
+        allShapes.add(new ShapeCharacter("Circle", "Common", 50, 300, 10, 5, 2, 30, 30, 2));
+        allShapes.add(new ShapeCharacter("Square", "Common", 50, 300, 12, 6, 2, 30, 30, 3));
+
+        allShapes.add(new ShapeCharacter("Rectangle", "Uncommon", 50, 300, 20, 10, 2, 40, 20, 6));
+        allShapes.add(new ShapeCharacter("Pentagon", "Uncommon", 50, 300, 22, 12, 2, 30, 30, 7));
+
+        allShapes.add(new ShapeCharacter("Hexagon", "Rare", 50, 300, 30, 15, 3, 30, 30, 10));
+        allShapes.add(new ShapeCharacter("Heptagon", "Rare", 50, 300, 35, 18, 2, 35, 35, 12));
+
+        allShapes.add(new ShapeCharacter("Octagon", "Epic", 50, 300, 45, 25, 3, 40, 40, 16));
+
+        allShapes.add(new ShapeCharacter("Nonagon", "Legendary", 50, 300, 55, 30, 3, 45, 45, 20));
+        allShapes.add(new ShapeCharacter("Decagon", "Legendary", 50, 300, 60, 35, 2, 50, 50, 22));
+
+        allShapes.add(new ShapeCharacter("Star", "Mythic", 50, 300, 80, 50, 4, 50, 50, 30));
+        return allShapes;
     }
 }

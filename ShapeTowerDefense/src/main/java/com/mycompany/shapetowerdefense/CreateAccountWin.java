@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
  * @author behnf
  */
 public class CreateAccountWin extends javax.swing.JFrame {
-
+    DataManager dm = DataManager.getInstance();
     /**
      * Creates new form CreateAccountWin
      */
@@ -46,14 +46,14 @@ public class CreateAccountWin extends javax.swing.JFrame {
         passwordLabel.setForeground(new java.awt.Color(255, 255, 255));
         passwordLabel.setText("Password:");
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("⏪Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
         });
 
-        createButton.setText("Create");
+        createButton.setText("Create⏩");
         createButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createButtonActionPerformed(evt);
@@ -129,7 +129,8 @@ public class CreateAccountWin extends javax.swing.JFrame {
                 String password = new String(passwordField.getPassword());
                 if (AccountManager.createAccount(username, password)) {
                     JOptionPane.showMessageDialog(null, "Account created successfully!");
-                    Main.afterLogin(username);
+                    dm.setUsername(username);
+                    dm.login(username);
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(null, "Username already exists!");

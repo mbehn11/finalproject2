@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
  * @author behnf
  */
 public class InventoryWin extends javax.swing.JFrame {
-
+    DataManager dm = DataManager.getInstance();
     private DefaultListModel<String> inventoryModel;
     private DefaultTableModel equippedListModel;
     /**
@@ -24,7 +24,7 @@ public class InventoryWin extends javax.swing.JFrame {
         inventoryModel = new DefaultListModel<>();
         
         // Load characters from DataManager into the inventory list
-        for (ShapeCharacter sc : Main.dataManager.getInventoryUnits()) {
+        for (ShapeCharacter sc : dm.getInventoryUnits()) {
             inventoryModel.addElement(sc.getName());
         }
         
@@ -32,41 +32,70 @@ public class InventoryWin extends javax.swing.JFrame {
         equippedListModel = new DefaultTableModel(new String[]{"Equipped Characters"}, 0);
         equippedList.setModel(equippedListModel);
         loadEquippedUnits();
+        refreshEquippedList();
     }
     private void loadEquippedUnits() {
-        // Should only load into my inventory I have to equip manually
-        equippedListModel.setRowCount(0);
-        for (ShapeCharacter sc : Main.dataManager.getEquippedUnits()) {
-            equippedListModel.addRow(new Object[]{sc.getName()});
+        equippedListModel.setRowCount(0); // Clear the table
+
+        // Only show up to 3 equipped characters
+        for (int i = 0; i < Math.min(3, dm.getEquippedUnits().size()); i++) {
+            ShapeCharacter sc = dm.getEquippedUnits().get(i);
+            equippedListModel.addRow(new Object[]{sc.getShapeType()});
+        }
+
+        // If we have less than 3, add empty slots
+        for (int i = dm.getEquippedUnits().size(); i < 3; i++) {
+            equippedListModel.addRow(new Object[]{"[Empty Slot]"});
+        }
+    }
+    
+    private void refreshEquippedList() {
+        equippedListModel.setRowCount(0); // Clear the table
+
+        // Always show exactly 3 slots
+        for (int i = 0; i < 3; i++) {
+            if (i < dm.getEquippedUnits().size()) {
+                // Show equipped character
+                ShapeCharacter sc = dm.getEquippedUnits().get(i);
+                equippedListModel.addRow(new Object[]{sc.getShapeType()});
+            } else {
+                // Show empty slot
+                equippedListModel.addRow(new Object[]{"[Empty Slot]"});
+            }
         }
     }
 
     private void equipCharacter() {
-        // Needs to be fixed
-        String selectedName = inventory.getSelectedValue(); // Get String name
+        // Check if a character is selected in inventory
+        String selectedName = inventory.getSelectedValue();
         if (selectedName == null) {
             JOptionPane.showMessageDialog(this, "Select a character to equip.");
             return;
         }
 
-        ShapeCharacter selectedCharacter = Main.dataManager.getCharacterByName(selectedName); // Retrieve ShapeCharacter
+        // Get the actual character object
+        ShapeCharacter selectedCharacter = dm.getCharacterByName(selectedName);
         if (selectedCharacter == null) {
             JOptionPane.showMessageDialog(this, "Character not found.");
             return;
         }
 
-        if (Main.dataManager.getEquippedUnits().size() >= 3) {
-            JOptionPane.showMessageDialog(this, "You can only equip up to 3 characters.");
+        // Check if already equipped
+        if (dm.getEquippedUnits().contains(selectedCharacter)) {
+            JOptionPane.showMessageDialog(this, "Character already equipped.");
             return;
         }
 
-        if (!Main.dataManager.getEquippedUnits().contains(selectedCharacter)) {
-            Main.dataManager.getEquippedUnits().add(selectedCharacter);
-            equippedListModel.addRow(new Object[]{selectedCharacter.getName()});
-            loadEquippedUnits(); // refresh equipped list.
+        // If we have less than 3, add to next available slot
+        if (dm.getEquippedUnits().size() < 3) {
+            dm.getEquippedUnits().add(selectedCharacter);
         } else {
-            JOptionPane.showMessageDialog(this, "Character already equipped.");
+            // If full, replace the first slot (or implement a selection)
+            dm.getEquippedUnits().set(0, selectedCharacter); // Simple version - always replaces slot 1
         }
+
+        // Refresh the equipped list display
+        refreshEquippedList();
     }
 
     /**
@@ -144,14 +173,14 @@ public class InventoryWin extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(inventory);
 
-        goToShop.setText("Shop");
+        goToShop.setText("🛒Shop");
         goToShop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 goToShopActionPerformed(evt);
             }
         });
 
-        goToLobby.setText("Lobby");
+        goToLobby.setText("🏠Lobby");
         goToLobby.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 goToLobbyActionPerformed(evt);
@@ -173,11 +202,11 @@ public class InventoryWin extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(goToLobby, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(equipButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(goToLobby, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                             .addComponent(goToShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -198,15 +227,15 @@ public class InventoryWin extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(equipButton)
+                        .addComponent(equipButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goToLobby)
+                        .addComponent(goToLobby, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goToShop))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(goToShop, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 

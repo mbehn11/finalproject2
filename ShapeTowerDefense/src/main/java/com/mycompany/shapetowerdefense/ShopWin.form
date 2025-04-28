@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.8" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
   </Properties>
@@ -69,16 +69,16 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="buyButton" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="upgradeFoodButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="buyButton" pref="35" max="32767" attributes="0"/>
+                      <Component id="upgradeFoodButton" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="jPanel3" max="32767" attributes="0"/>
                       <Component id="jPanel4" max="32767" attributes="0"/>
+                      <Component id="jPanel3" max="32767" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="17" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -86,7 +86,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="buyButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Buy Character"/>
+            <Property name="text" type="java.lang.String" value="\ud83d\udcb0Buy Character(50)" containsInvalidXMLChars="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buyButtonActionPerformed"/>
@@ -94,7 +94,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="upgradeFoodButton">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Upgrade Food Generation"/>
+            <Property name="text" type="java.lang.String" value="\ud83d\udcb0Upgrade Food Generation(125)" containsInvalidXMLChars="true"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="upgradeFoodButtonActionPerformed"/>
@@ -110,6 +110,8 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="toInventoryButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="toLobbyButton" min="-2" pref="100" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Component id="goldLabel" max="32767" attributes="0"/>
@@ -122,10 +124,13 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="toInventoryButton" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="toInventoryButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="toLobbyButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="goldLabel" min="-2" pref="34" max="-2" attributes="0"/>
-                      <EmptySpace pref="42" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -133,7 +138,7 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="toInventoryButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Inventory"/>
+                <Property name="text" type="java.lang.String" value="\ud83d\udce6Inventory" containsInvalidXMLChars="true"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="toInventoryButtonActionPerformed"/>
@@ -141,8 +146,16 @@
             </Component>
             <Component class="javax.swing.JLabel" name="goldLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Gold:"/>
+                <Property name="text" type="java.lang.String" value="\ud83d\udcb0Gold:" containsInvalidXMLChars="true"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="toLobbyButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="\ud83c\udfe0Lobby" containsInvalidXMLChars="true"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="toLobbyButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
@@ -174,7 +187,7 @@
                       <Component id="healthLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                       <Component id="damageLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="12" max="32767" attributes="0"/>
+                      <EmptySpace pref="47" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

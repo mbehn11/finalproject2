@@ -6,7 +6,7 @@ package com.mycompany.shapetowerdefense;
 
 import java.io.*;
 
-public class AccountManager {
+public class AccountManager { 
     private static final String ACCOUNT_FILE = "accounts.txt";
 
     public static boolean login(String username, String password) {

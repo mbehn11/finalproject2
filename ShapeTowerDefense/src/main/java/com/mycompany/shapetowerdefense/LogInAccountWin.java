@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
  * @author behnf
  */
 public class LogInAccountWin extends javax.swing.JFrame {
-
     /**
      * Creates new form LogInAccountWin
      */
@@ -21,15 +20,19 @@ public class LogInAccountWin extends javax.swing.JFrame {
 
     private void login() {
         String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-                if (AccountManager.login(username, password)) {
-                    JOptionPane.showMessageDialog(null, "Login Successful!");
-                    Main.afterLogin(username);
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Invalid username or password!");
-                }
+        String password = new String(passwordField.getPassword());
+
+        if (AccountManager.login(username, password)) {
+            JOptionPane.showMessageDialog(null, "Login Successful!");
+            // Get the singleton instance and call the instance method
+            DataManager dm = DataManager.getInstance();
+            dm.login(username);
+            dispose();
+        } else {
+            JOptionPane.showMessageDialog(null, "Invalid username or password!");
+        }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -51,14 +54,14 @@ public class LogInAccountWin extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 102, 102));
 
-        loginButton.setText("Log In");
+        loginButton.setText("Log In⏩");
         loginButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loginButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("⏪Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -66,10 +69,10 @@ public class LogInAccountWin extends javax.swing.JFrame {
         });
 
         usernameLabel.setForeground(new java.awt.Color(255, 255, 255));
-        usernameLabel.setText("Username");
+        usernameLabel.setText("Username:");
 
         passwordLabel.setForeground(new java.awt.Color(255, 255, 255));
-        passwordLabel.setText("Password");
+        passwordLabel.setText("Password:");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -83,10 +86,10 @@ public class LogInAccountWin extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 161, Short.MAX_VALUE)
                         .addComponent(loginButton, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
+                        .addGap(9, 9, 9)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(usernameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(passwordLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(passwordLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(usernameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(usernameField)
