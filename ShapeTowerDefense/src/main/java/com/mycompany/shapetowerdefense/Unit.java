@@ -5,7 +5,7 @@
 package com.mycompany.shapetowerdefense;
 
 import java.io.Serializable;
-
+ 
 public abstract class Unit implements Serializable {
     private static final long serialVersionUID = 1L;
     protected int x, y;

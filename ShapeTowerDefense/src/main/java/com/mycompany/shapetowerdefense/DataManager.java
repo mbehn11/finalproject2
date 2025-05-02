@@ -6,19 +6,23 @@ package com.mycompany.shapetowerdefense;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 // Singleton Approach
 // Main has access to DataManager which means every class can use Main.DataManager to access anything
 // TODO:::::::::::::::::::::::::
-// add icons for message pop ups( Inventory, gold, shop, play ) // started
-// change battleWin button texts // done
-// fix loading and saving data it seems to keep making a new dataManager instance // confused
-// inventory broken with amount of characters equipped // done
-// fix battlewin character placements // done
-// fix food bug in battleWin // done
 // add highscore api // confused
-// Try redrawing on only region that needs to redraw
+// change drawing polygon code to my own
+// fix message title
+// fix screens titles
+// fix so I cant type or resize anything
+// fix the bug that constantly tells me I have no third character equipped
+// make battleWin dialog not pop up
+// weird code in shopWin
+
+// change text color in shop to brighten game up 
 // :::::::::::::::::::::::::::::
 public class DataManager implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -30,13 +34,13 @@ public class DataManager implements Serializable {
     public int highestWave;
     private ArrayList<ShapeCharacter> equippedUnits;
     private int UnitsCount = 0;
-    private ArrayList<ShapeCharacter> inventoryUnits; // Added inventory units
+    private ArrayList<ShapeCharacter> inventoryUnits; 
 
     public DataManager() {
         gold = 100;
         highestWave = 0;
         equippedUnits = new ArrayList<>();
-        inventoryUnits = new ArrayList<>(); // Initialize inventory units
+        inventoryUnits = new ArrayList<>(); 
     }
     
     // Singleton Accessor
@@ -52,8 +56,8 @@ public class DataManager implements Serializable {
         }
         return instance;
     }
-
-    // Unit methods
+    
+    // Unit methods    
     public ArrayList<ShapeCharacter> getEquippedUnits() {
         return new ArrayList<>(equippedUnits);
     }

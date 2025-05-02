@@ -4,7 +4,6 @@
  */
 package com.mycompany.shapetowerdefense;
 
-import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,7 +13,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class LobbyWin extends javax.swing.JFrame {
     DataManager dm = DataManager.getInstance();
-    private DefaultTableModel equippedListModel;
+    private final DefaultTableModel equippedListModel;
     /**
      * Creates new form Lobby
      */
@@ -24,15 +23,22 @@ public class LobbyWin extends javax.swing.JFrame {
         goldLabel.setText("💰Gold: " + dm.getGold()); // always 100
         waveLabel.setText("👑Highest Wave: " + dm.getHighestWave()); // always 0
         equippedListModel = new DefaultTableModel(new String[]{"Equipped Characters"}, 0); // always empty when first loaded
-        equippedList.setModel(equippedListModel);
+        equippedList.setModel(equippedListModel); 
         loadEquippedUnits();
     }
     
     private void loadEquippedUnits() {
-        // Should only load into my inventory I have to equip manually
-        equippedListModel.setRowCount(0);
-        for (ShapeCharacter sc : dm.getEquippedUnits()) {
+        equippedListModel.setRowCount(0); // Clear the table
+
+        // Only show up to 3 equipped characters
+        for (int i = 0; i < Math.min(3, dm.getEquippedUnits().size()); i++) {
+            ShapeCharacter sc = dm.getEquippedUnits().get(i);
             equippedListModel.addRow(new Object[]{sc.getShapeType()});
+        }
+
+        // If we have less than 3, add empty slots
+        for (int i = dm.getEquippedUnits().size(); i < 3; i++) {
+            equippedListModel.addRow(new Object[]{"[Empty Slot]"});
         }
     }
     // Load into the equippedList so the user sees 
@@ -61,11 +67,17 @@ public class LobbyWin extends javax.swing.JFrame {
         equippedList = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         goToSplashScreen = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        leaderboard = new javax.swing.JList<>();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Lobby");
+        setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel1.setBackground(new java.awt.Color(0, 153, 204));
 
+        playButton.setBackground(new java.awt.Color(51, 255, 0));
         playButton.setText("Play➤");
         playButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -73,6 +85,7 @@ public class LobbyWin extends javax.swing.JFrame {
             }
         });
 
+        shopButton.setBackground(new java.awt.Color(255, 204, 153));
         shopButton.setText("🛒Shop");
         shopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -80,6 +93,7 @@ public class LobbyWin extends javax.swing.JFrame {
             }
         });
 
+        inventoryButton.setBackground(new java.awt.Color(255, 204, 153));
         inventoryButton.setText("📦Inventory");
         inventoryButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -87,8 +101,11 @@ public class LobbyWin extends javax.swing.JFrame {
             }
         });
 
-        usernameLabelPanel.setBackground(new java.awt.Color(0, 102, 102));
+        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 0, 255), new java.awt.Color(0, 51, 255), new java.awt.Color(153, 153, 255), new java.awt.Color(204, 102, 255)));
 
+        usernameLabelPanel.setBackground(new java.awt.Color(153, 204, 255));
+
+        usernameLabel.setForeground(new java.awt.Color(0, 51, 255));
         usernameLabel.setText("jLabel1");
 
         javax.swing.GroupLayout usernameLabelPanelLayout = new javax.swing.GroupLayout(usernameLabelPanel);
@@ -97,7 +114,7 @@ public class LobbyWin extends javax.swing.JFrame {
             usernameLabelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(usernameLabelPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(usernameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 95, Short.MAX_VALUE)
+                .addComponent(usernameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
                 .addContainerGap())
         );
         usernameLabelPanelLayout.setVerticalGroup(
@@ -108,8 +125,9 @@ public class LobbyWin extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        goldLabelPanel.setBackground(new java.awt.Color(0, 102, 102));
+        goldLabelPanel.setBackground(new java.awt.Color(153, 204, 255));
 
+        goldLabel.setForeground(new java.awt.Color(255, 255, 0));
         goldLabel.setText("jLabel2");
 
         javax.swing.GroupLayout goldLabelPanelLayout = new javax.swing.GroupLayout(goldLabelPanel);
@@ -118,7 +136,7 @@ public class LobbyWin extends javax.swing.JFrame {
             goldLabelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(goldLabelPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(goldLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                .addComponent(goldLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         goldLabelPanelLayout.setVerticalGroup(
@@ -129,8 +147,9 @@ public class LobbyWin extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        waveLabelPanel.setBackground(new java.awt.Color(0, 102, 102));
+        waveLabelPanel.setBackground(new java.awt.Color(153, 204, 255));
 
+        waveLabel.setForeground(new java.awt.Color(255, 0, 0));
         waveLabel.setText("jLabel3");
 
         javax.swing.GroupLayout waveLabelPanelLayout = new javax.swing.GroupLayout(waveLabelPanel);
@@ -139,7 +158,7 @@ public class LobbyWin extends javax.swing.JFrame {
             waveLabelPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(waveLabelPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(waveLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                .addComponent(waveLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
                 .addContainerGap())
         );
         waveLabelPanelLayout.setVerticalGroup(
@@ -157,9 +176,9 @@ public class LobbyWin extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(usernameLabelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(goldLabelPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(waveLabelPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -174,6 +193,7 @@ public class LobbyWin extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        equippedList.setBackground(new java.awt.Color(153, 204, 255));
         equippedList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -193,17 +213,38 @@ public class LobbyWin extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        equippedList.setEnabled(false);
+        equippedList.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(equippedList);
+        if (equippedList.getColumnModel().getColumnCount() > 0) {
+            equippedList.getColumnModel().getColumn(0).setResizable(false);
+            equippedList.getColumnModel().getColumn(1).setResizable(false);
+            equippedList.getColumnModel().getColumn(2).setResizable(false);
+        }
 
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 153, 255));
         jLabel1.setText("Equipped List");
 
+        goToSplashScreen.setBackground(new java.awt.Color(255, 51, 51));
         goToSplashScreen.setText("⏪Log Out");
         goToSplashScreen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 goToSplashScreenActionPerformed(evt);
             }
         });
+
+        leaderboard.setBackground(new java.awt.Color(153, 204, 255));
+        leaderboard.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane1.setViewportView(leaderboard);
+
+        jLabel2.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 153, 255));
+        jLabel2.setText("Leaderboard");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -212,24 +253,28 @@ public class LobbyWin extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(shopButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(inventoryButton, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
                             .addComponent(goToSplashScreen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(playButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane1)
+                                .addGap(18, 18, 18))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(49, 49, 49)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(playButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(79, 79, 79))))))
+                                .addGap(63, 63, 63)))))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,51 +283,55 @@ public class LobbyWin extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(goToSplashScreen, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(inventoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(shopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
                             .addComponent(playButton, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(goToSplashScreen, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(inventoryButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(shopButton, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(7, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playButtonActionPerformed
-//        ArrayList<ShapeCharacter> equippedUnits = Main.dataManager.getEquippedUnits(); // Get equipped characters
         // Check if character amount is atleast 1 before playing
         if(dm.getUnitCount() > 0){
             new BattleWin().setVisible(true); // Pass them to BattleWin
             dispose(); 
         }
-        else{
-            JOptionPane.showMessageDialog(this, "Need to have atleast 1 character to play"); // add title to message
+        else {
+            JOptionPane.showMessageDialog(
+                this,
+                "Need to have at least 1 character to play",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE
+            );
         }
+
     }//GEN-LAST:event_playButtonActionPerformed
 
     private void shopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shopButtonActionPerformed
@@ -353,9 +402,12 @@ public class LobbyWin extends javax.swing.JFrame {
     private javax.swing.JPanel goldLabelPanel;
     private javax.swing.JButton inventoryButton;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JList<String> leaderboard;
     private javax.swing.JButton playButton;
     private javax.swing.JButton shopButton;
     private javax.swing.JLabel usernameLabel;

@@ -8,7 +8,7 @@ package com.mycompany.shapetowerdefense;
  *
  * @author behnf
  */
-
+ 
 public class Enemy extends Unit {
     public Enemy(String shapeType, int x, int y, int health, int damage, int speed, int width, int height) {
         super(x, y, health, damage, speed, width, height, shapeType);

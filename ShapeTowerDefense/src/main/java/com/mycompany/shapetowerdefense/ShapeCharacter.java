@@ -22,8 +22,8 @@ public class ShapeCharacter extends Unit implements Serializable {
     public void moveForward() {
         x += speed; // Moves right toward enemy
     }
-
-    public String getName() { return shapeType; }
+    @Override
+    public String getShapeType() { return shapeType; }
     public String getRarity() { return rarity; }
     public int getCost() { return cost; }
 

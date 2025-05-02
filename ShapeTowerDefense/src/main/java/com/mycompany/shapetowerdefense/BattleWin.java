@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 
@@ -16,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
  * @author behnf
  */
 public class BattleWin extends javax.swing.JFrame {
+
     DataManager dm = DataManager.getInstance();
     private ArrayList<ShapeCharacter> playerUnits = new ArrayList<>();
     private ArrayList<Enemy> enemies = new ArrayList<>();
@@ -29,13 +31,13 @@ public class BattleWin extends javax.swing.JFrame {
     private Timer spawnTimer;
     private int playerFood = 0;
     private int currentWave = dm.getHighestWave();
-    
+
     /**
      * Creates new form BattleScreen
      */
     public BattleWin() { // pass in the equipped List or retrieve it somehow
         initComponents();
-        
+
         startBattleButton.setVisible(true);
         // Keep Track of the Gold, Wave, and Food amount
         // Buttons need to check with the cost of the shapeCharacter 
@@ -47,7 +49,7 @@ public class BattleWin extends javax.swing.JFrame {
         spawnTimer = new Timer(2000, e -> spawnEnemy());
         foodTimer.start();
     }
-    
+
     private Timer foodTimer = new Timer(1000, e -> {
         if (battleStarted) {
             playerFood += 1 * dm.getFoodGenerationMultiplier(); // 1 food per second
@@ -56,21 +58,28 @@ public class BattleWin extends javax.swing.JFrame {
     });
     
     private void loadEquippedUnits() {
-        // Should only load into my equipped list I have to equip manually
-        equippedListModel.setRowCount(0);
-        for (ShapeCharacter sc : dm.getEquippedUnits()) {
+        equippedListModel.setRowCount(0); // Clear the table
+
+        // Only show up to 3 equipped characters
+        for (int i = 0; i < Math.min(3, dm.getEquippedUnits().size()); i++) {
+            ShapeCharacter sc = dm.getEquippedUnits().get(i);
             equippedListModel.addRow(new Object[]{sc.getShapeType()});
+        }
+
+        // If we have less than 3, add empty slots
+        for (int i = dm.getEquippedUnits().size(); i < 3; i++) {
+            equippedListModel.addRow(new Object[]{"[Empty Slot]"});
         }
         updateButtonCosts();
     }
-   
+
     private void updateAllLabels() {
         foodLabel.setText("🍎Food: " + playerFood);
         goldLabel.setText("💰Gold: " + dm.getGold());
         waveLabel.setText("👑Wave: " + dm.getHighestWave());
         updateButtonCosts();
     }
-    
+
     private void updateButtonCosts() {
         // Get the currently equipped characters
         ShapeCharacter char1 = getShapeCharacter1();
@@ -104,7 +113,7 @@ public class BattleWin extends javax.swing.JFrame {
             spawnChar3Btn.setEnabled(false);
         }
     }
-    
+
     private void startBattle() {
         battleStarted = true;
         startBattleButton.setEnabled(false);
@@ -113,9 +122,15 @@ public class BattleWin extends javax.swing.JFrame {
         spawnTimer.start();
         dm.setHighestWave(currentWave);
         updateAllLabels();
+        updateWave();
     }
-    
+
     private void updateWave() {
+        if(battleStarted = true) {
+                gameLog2.setText("");
+                gameLog.setText("Starting wave " + currentWave);
+            }
+
         if (enemies.isEmpty() && enemiesSpawnedThisWave >= enemiesPerWave) {
             // Pause all timers
             foodTimer.stop();
@@ -134,11 +149,7 @@ public class BattleWin extends javax.swing.JFrame {
             dm.addGold(currentWave * 10);
             playerFood += currentWave * 5;
             updateAllLabels();
-
-            // Show dialog - this blocks execution until dismissed
-            JOptionPane.showMessageDialog(this,
-                    "Wave " + (currentWave - 1) + " completed! Starting wave " + currentWave);
-
+           
             // Restart timers after dialog is closed
             foodTimer.start();
             gameTimer.start();
@@ -146,38 +157,36 @@ public class BattleWin extends javax.swing.JFrame {
             spawnTimer.start();
         }
     }
-    
+
     private void spawnEnemy() {
         if (battleStarted && enemiesSpawnedThisWave < enemiesPerWave) {
             // Only spawn circles
-            int health = 5 + currentWave * 10;
-            int damage = 5 + currentWave * 2;
-            int speed = 1 + currentWave / 5;
+            int health = 10 + currentWave;
+            int damage = 5 + currentWave;
+            int speed = 1;
             int size = 30; // Circle diameter
 
             Enemy enemy = new Enemy(
-                "Circle",                   // Only circles
-                getWidth() - size,          // x position (right side)
-                getHeight()/2,
-                health,
-                damage,
-                speed,
-                size,
-                size
+                    "Circle", // Only circles
+                    getWidth() - size, // x position (right side)
+                    getHeight() / 2,
+                    health,
+                    damage,
+                    speed,
+                    size,
+                    size
             );
 
             enemies.add(enemy);
             enemiesSpawnedThisWave++;
         }
     }
+
     private ShapeCharacter getShapeCharacter1() {
-        try {
+        try { // fix this so that it doesnt check anything because we wouldnt be able to play unless we had a character
             if (equippedListModel.getRowCount() > 0) {
                 String charName = (String) equippedListModel.getValueAt(0, 0);
                 ShapeCharacter character = dm.getCharacterByName(charName);
-                if (character == null) {
-                    JOptionPane.showMessageDialog(this, "Character in slot 1 not found in data manager");
-                }
                 return character;
             }
         } catch (Exception e) {
@@ -191,9 +200,6 @@ public class BattleWin extends javax.swing.JFrame {
             if (equippedListModel.getRowCount() > 1) {
                 String charName = (String) equippedListModel.getValueAt(1, 0);
                 ShapeCharacter character = dm.getCharacterByName(charName);
-                if (character == null) {
-                    JOptionPane.showMessageDialog(this, "Character in slot 2 not found in data manager");
-                }
                 return character;
             }
         } catch (Exception e) {
@@ -207,9 +213,6 @@ public class BattleWin extends javax.swing.JFrame {
             if (equippedListModel.getRowCount() > 2) {
                 String charName = (String) equippedListModel.getValueAt(2, 0);
                 ShapeCharacter character = dm.getCharacterByName(charName);
-                if (character == null) {
-                    JOptionPane.showMessageDialog(this, "Character in slot 3 not found in data manager");
-                }
                 return character;
             }
         } catch (Exception e) {
@@ -217,13 +220,13 @@ public class BattleWin extends javax.swing.JFrame {
         }
         return null;
     }
-    
+
     private void updateGame() {
         // Move units
         for (ShapeCharacter unit : playerUnits) {
             unit.moveForward();
-        } 
-        
+        }
+
         for (Enemy unit : enemies) {
             unit.moveForward();
         }
@@ -237,7 +240,7 @@ public class BattleWin extends javax.swing.JFrame {
                 enemiesDefeatedThisWave++;
                 dm.addGold(5);
                 enemies.remove(i);
-                i--; 
+                i--;
             }
         }
 
@@ -259,15 +262,14 @@ public class BattleWin extends javax.swing.JFrame {
 
         // Check for wave completion
         updateWave();
-
         repaint();
     }
-    
+
     private boolean collidesWith(Unit unit1, Unit unit2) {
-        return unit1.getX() < unit2.getX() + unit2.getWidth() &&
-               unit1.getX() + unit1.getWidth() > unit2.getX() &&
-               unit1.getY() < unit2.getY() + unit2.getHeight() &&
-               unit1.getY() + unit1.getHeight() > unit2.getY();
+        return unit1.getX() < unit2.getX() + unit2.getWidth()
+                && unit1.getX() + unit1.getWidth() > unit2.getX()
+                && unit1.getY() < unit2.getY() + unit2.getHeight()
+                && unit1.getY() + unit1.getHeight() > unit2.getY();
     }
 
     // Updated checkCollisions() to use the new method
@@ -283,17 +285,17 @@ public class BattleWin extends javax.swing.JFrame {
 
                     if (!enemy.isAlive()) {
                         enemies.remove(j);
-                        j--; 
+                        j--;
                     }
                 }
             }
             if (!player.isAlive()) {
                 playerUnits.remove(i);
-                i--; 
+                i--;
             }
         }
     }
-    
+
     private void gameOver() {
         gameTimer.stop();
         waveTimer.stop();
@@ -303,7 +305,7 @@ public class BattleWin extends javax.swing.JFrame {
         new LobbyWin().setVisible(true);
         dispose();
     }
-    
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -351,11 +353,10 @@ public class BattleWin extends javax.swing.JFrame {
                             break;
                     }
 
-
                     // Health bar
                     g.setColor(Color.GREEN);
-                    int healthWidth = (int)((double)unit.getHealth()/unit.getMaxHealth() * unit.getWidth());
-                    g.fillRect(unit.getX(), unit.getY()-10, healthWidth, 5);
+                    int healthWidth = (int) ((double) unit.getHealth() / unit.getMaxHealth() * unit.getWidth());
+                    g.fillRect(unit.getX(), unit.getY() - 10, healthWidth, 5);
                 }
             }
 
@@ -367,13 +368,13 @@ public class BattleWin extends javax.swing.JFrame {
 
                     // Health bar
                     g.setColor(Color.GREEN);
-                    int healthWidth = (int)((double)enemy.getHealth()/enemy.getMaxHealth() * enemy.getWidth());
-                    g.fillRect(enemy.getX(), enemy.getY()-10, healthWidth, 5);
+                    int healthWidth = (int) ((double) enemy.getHealth() / enemy.getMaxHealth() * enemy.getWidth());
+                    g.fillRect(enemy.getX(), enemy.getY() - 10, healthWidth, 5);
                 }
             }
         }
     }
-    
+
     // this is generated by chat because I would never be able to make this
     private void drawRegularPolygon(Graphics g, int sides, int centerX, int centerY, int radius) {
         int[] xPoints = new int[sides];
@@ -399,20 +400,19 @@ public class BattleWin extends javax.swing.JFrame {
         g.fillPolygon(xPoints, yPoints, points * 2);
     }
 
-    
     private void spawnCharacter(ShapeCharacter template) {
         if (template != null && playerFood >= template.getCost()) {
             ShapeCharacter newUnit = new ShapeCharacter(
-                template.getShapeType(),
-                template.getRarity(),
-                0,  
-                getHeight()/2, 
-                template.getHealth(),
-                template.getDamage(),
-                template.getSpeed(),
-                template.getWidth(),
-                template.getHeight(),
-                template.getCost()
+                    template.getShapeType(),
+                    template.getRarity(),
+                    0,
+                    getHeight() / 2,
+                    template.getHealth(),
+                    template.getDamage(),
+                    template.getSpeed(),
+                    template.getWidth(),
+                    template.getHeight(),
+                    template.getCost()
             );
 
             playerUnits.add(newUnit);
@@ -444,15 +444,21 @@ public class BattleWin extends javax.swing.JFrame {
         spawnChar2Btn = new javax.swing.JButton();
         spawnChar3Btn = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        gameLog = new javax.swing.JLabel();
+        gameLog2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Battle");
+        setResizable(false);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(0, 102, 102));
 
-        jPanel4.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel4.setBackground(new java.awt.Color(204, 204, 255));
 
+        foodLabel.setForeground(new java.awt.Color(0, 0, 255));
         foodLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        foodLabel.setText("Food:");
+        foodLabel.setText("🍎Food:");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -471,16 +477,17 @@ public class BattleWin extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel2.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel2.setBackground(new java.awt.Color(204, 204, 255));
 
+        waveLabel.setForeground(new java.awt.Color(255, 0, 51));
         waveLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        waveLabel.setText("Wave:");
+        waveLabel.setText("👑Wave:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(waveLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+            .addComponent(waveLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -490,10 +497,11 @@ public class BattleWin extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3.setBackground(new java.awt.Color(0, 153, 153));
+        jPanel3.setBackground(new java.awt.Color(204, 204, 255));
 
+        goldLabel.setForeground(new java.awt.Color(255, 255, 0));
         goldLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        goldLabel.setText("Gold:");
+        goldLabel.setText("💰Gold:");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -536,6 +544,9 @@ public class BattleWin extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        equippedList.setBackground(new java.awt.Color(153, 204, 255));
         equippedList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -555,92 +566,68 @@ public class BattleWin extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        equippedList.setAutoscrolls(false);
+        equippedList.setEnabled(false);
+        equippedList.setRowSelectionAllowed(false);
         jScrollPane1.setViewportView(equippedList);
 
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(522, 276, 206, 89));
+
+        spawnChar1Btn.setBackground(new java.awt.Color(255, 204, 153));
         spawnChar1Btn.setText("Spawn 1");
         spawnChar1Btn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 spawnChar1BtnActionPerformed(evt);
             }
         });
+        getContentPane().add(spawnChar1Btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 292, 402, -1));
 
+        startBattleButton.setBackground(new java.awt.Color(0, 255, 0));
         startBattleButton.setText("Begin Battle➤");
         startBattleButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 startBattleButtonActionPerformed(evt);
             }
         });
+        getContentPane().add(startBattleButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(249, 263, 129, -1));
 
+        spawnChar2Btn.setBackground(new java.awt.Color(255, 204, 153));
         spawnChar2Btn.setText("Spawn 2");
         spawnChar2Btn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 spawnChar2BtnActionPerformed(evt);
             }
         });
+        getContentPane().add(spawnChar2Btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 317, 402, -1));
 
+        spawnChar3Btn.setBackground(new java.awt.Color(255, 204, 153));
         spawnChar3Btn.setText("Spawn 3");
         spawnChar3Btn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 spawnChar3BtnActionPerformed(evt);
             }
         });
+        getContentPane().add(spawnChar3Btn, new org.netbeans.lib.awtextra.AbsoluteConstraints(114, 342, 402, -1));
 
+        jButton1.setBackground(new java.awt.Color(255, 51, 51));
         jButton1.setText("⏪Go Back");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(6, 292, 102, 73));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(spawnChar1Btn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(spawnChar2Btn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
-                                .addComponent(spawnChar3Btn, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(4, 4, 4)
-                                .addComponent(startBattleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(29, 29, 29)
-                                .addComponent(spawnChar3Btn, javax.swing.GroupLayout.DEFAULT_SIZE, 44, Short.MAX_VALUE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(startBattleButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(spawnChar1Btn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(spawnChar2Btn, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
-        );
+        gameLog.setBackground(new java.awt.Color(255, 51, 51));
+        gameLog.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        gameLog.setForeground(new java.awt.Color(255, 0, 0));
+        gameLog.setText("Press Begin Battle to start!");
+        getContentPane().add(gameLog, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 230, -1));
+
+        gameLog2.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        gameLog2.setForeground(new java.awt.Color(255, 51, 51));
+        gameLog2.setText("Spawn Characters using your food to fend off enemies");
+        getContentPane().add(gameLog2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, 480, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -711,10 +698,14 @@ public class BattleWin extends javax.swing.JFrame {
             }
         });
     }
-
+public static class MyJpanel extends JPanel {
+    
+}
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable equippedList;
     private javax.swing.JLabel foodLabel;
+    private javax.swing.JLabel gameLog;
+    private javax.swing.JLabel gameLog2;
     private javax.swing.JLabel goldLabel;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;

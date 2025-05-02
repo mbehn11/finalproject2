@@ -4,6 +4,7 @@
  */
 package com.mycompany.shapetowerdefense;
 
+import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -25,7 +26,7 @@ public class InventoryWin extends javax.swing.JFrame {
         
         // Load characters from DataManager into the inventory list
         for (ShapeCharacter sc : dm.getInventoryUnits()) {
-            inventoryModel.addElement(sc.getName());
+            inventoryModel.addElement(sc.getShapeType());
         }
         
         inventory.setModel(inventoryModel);
@@ -52,50 +53,58 @@ public class InventoryWin extends javax.swing.JFrame {
     private void refreshEquippedList() {
         equippedListModel.setRowCount(0); // Clear the table
 
-        // Always show exactly 3 slots
+        // Show all 3 slots
         for (int i = 0; i < 3; i++) {
             if (i < dm.getEquippedUnits().size()) {
-                // Show equipped character
                 ShapeCharacter sc = dm.getEquippedUnits().get(i);
                 equippedListModel.addRow(new Object[]{sc.getShapeType()});
             } else {
-                // Show empty slot
                 equippedListModel.addRow(new Object[]{"[Empty Slot]"});
             }
         }
     }
 
-    private void equipCharacter() {
-        // Check if a character is selected in inventory
+    private void equipCharacterToSlot(int slotIndex) {
         String selectedName = inventory.getSelectedValue();
         if (selectedName == null) {
-            JOptionPane.showMessageDialog(this, "Select a character to equip.");
+            JOptionPane.showMessageDialog(this, "Please select a character from your inventory to equip.","Warning",
+        JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Get the actual character object
         ShapeCharacter selectedCharacter = dm.getCharacterByName(selectedName);
         if (selectedCharacter == null) {
-            JOptionPane.showMessageDialog(this, "Character not found.");
+            JOptionPane.showMessageDialog(this, "Character data not found.","Warning",
+        JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // Check if already equipped
-        if (dm.getEquippedUnits().contains(selectedCharacter)) {
-            JOptionPane.showMessageDialog(this, "Character already equipped.");
-            return;
+        ArrayList<ShapeCharacter> equipped = dm.getEquippedUnits();
+
+        // Ensure the list has exactly 3 slots
+        while (equipped.size() < 3) {
+            equipped.add(null);
         }
 
-        // If we have less than 3, add to next available slot
-        if (dm.getEquippedUnits().size() < 3) {
-            dm.getEquippedUnits().add(selectedCharacter);
-        } else {
-            // If full, replace the first slot (or implement a selection)
-            dm.getEquippedUnits().set(0, selectedCharacter); // Simple version - always replaces slot 1
+        // Replace or add in the specific slot
+        equipped.set(slotIndex, selectedCharacter);
+
+        // Remove trailing nulls if needed (optional)
+        for (int i = equipped.size() - 1; i >= 0; i--) {
+            if (equipped.get(i) == null) {
+                equipped.remove(i);
+            } else {
+                break;
+            }
         }
 
-        // Refresh the equipped list display
-        refreshEquippedList();
+        dm.setEquippedUnits(equipped); // Save the updated list
+        refreshEquippedList(); // Refresh the table
+
+        JOptionPane.showMessageDialog(this,
+                selectedCharacter.getShapeType() + " equipped in slot " + (slotIndex + 1),
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -112,13 +121,15 @@ public class InventoryWin extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         equippedList = new javax.swing.JTable();
-        equipButton = new javax.swing.JButton();
+        equipButton1 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         inventory = new javax.swing.JList<>();
         goToShop = new javax.swing.JButton();
         goToLobby = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        equipButton2 = new javax.swing.JButton();
+        equipButton3 = new javax.swing.JButton();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -134,10 +145,15 @@ public class InventoryWin extends javax.swing.JFrame {
         jScrollPane3.setViewportView(jTable1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Inventory");
+        setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(0, 102, 102));
+        jPanel1.setBackground(new java.awt.Color(0, 153, 204));
         jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder());
 
+        equippedList.setBackground(new java.awt.Color(153, 204, 255));
+        equippedList.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        equippedList.setForeground(new java.awt.Color(51, 51, 255));
         equippedList.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -157,22 +173,38 @@ public class InventoryWin extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        equippedList.setEnabled(false);
+        equippedList.setFocusable(false);
         jScrollPane4.setViewportView(equippedList);
+        if (equippedList.getColumnModel().getColumnCount() > 0) {
+            equippedList.getColumnModel().getColumn(0).setResizable(false);
+            equippedList.getColumnModel().getColumn(1).setResizable(false);
+            equippedList.getColumnModel().getColumn(2).setResizable(false);
+        }
 
-        equipButton.setText("Equip");
-        equipButton.addActionListener(new java.awt.event.ActionListener() {
+        equipButton1.setBackground(new java.awt.Color(255, 204, 153));
+        equipButton1.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        equipButton1.setForeground(new java.awt.Color(255, 0, 51));
+        equipButton1.setText("Equip Slot1");
+        equipButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                equipButtonActionPerformed(evt);
+                equipButton1ActionPerformed(evt);
             }
         });
 
+        inventory.setBackground(new java.awt.Color(153, 204, 255));
+        inventory.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, new java.awt.Color(51, 51, 255), null, null));
+        inventory.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        inventory.setForeground(new java.awt.Color(51, 51, 255));
         inventory.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
+        inventory.setAutoscrolls(false);
         jScrollPane1.setViewportView(inventory);
 
+        goToShop.setBackground(new java.awt.Color(255, 204, 153));
         goToShop.setText("🛒Shop");
         goToShop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -180,6 +212,7 @@ public class InventoryWin extends javax.swing.JFrame {
             }
         });
 
+        goToLobby.setBackground(new java.awt.Color(255, 204, 153));
         goToLobby.setText("🏠Lobby");
         goToLobby.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -187,11 +220,33 @@ public class InventoryWin extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 255, 51));
         jLabel1.setText("Equipped Characters");
 
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(51, 255, 51));
         jLabel2.setText("Inventory");
+
+        equipButton2.setBackground(new java.awt.Color(255, 204, 153));
+        equipButton2.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        equipButton2.setForeground(new java.awt.Color(255, 0, 51));
+        equipButton2.setText("Equip Slot2");
+        equipButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                equipButton2ActionPerformed(evt);
+            }
+        });
+
+        equipButton3.setBackground(new java.awt.Color(255, 204, 153));
+        equipButton3.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        equipButton3.setForeground(new java.awt.Color(255, 0, 51));
+        equipButton3.setText("Equip Slot3");
+        equipButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                equipButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -203,39 +258,47 @@ public class InventoryWin extends javax.swing.JFrame {
                     .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(equipButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(goToLobby, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                            .addComponent(goToShop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(equipButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(equipButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(equipButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(8, 8, 8)
+                .addComponent(goToLobby, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(66, 66, 66)
+                .addComponent(jLabel2)
+                .addGap(70, 70, 70)
+                .addComponent(goToShop, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(71, 71, 71))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(188, 188, 188)
-                .addComponent(jLabel2)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(58, 58, 58))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
-                .addComponent(jLabel2)
+                .addContainerGap(11, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(goToLobby)
+                    .addComponent(jLabel2)
+                    .addComponent(goToShop))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(equipButton, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
+                        .addComponent(equipButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goToLobby, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(equipButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goToShop, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(equipButton3))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -253,9 +316,9 @@ public class InventoryWin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void equipButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equipButtonActionPerformed
-        equipCharacter();
-    }//GEN-LAST:event_equipButtonActionPerformed
+    private void equipButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equipButton1ActionPerformed
+        equipCharacterToSlot(0);
+    }//GEN-LAST:event_equipButton1ActionPerformed
 
     private void goToShopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_goToShopActionPerformed
         new ShopWin().setVisible(true);
@@ -266,6 +329,14 @@ public class InventoryWin extends javax.swing.JFrame {
         new LobbyWin().setVisible(true);
                 dispose();
     }//GEN-LAST:event_goToLobbyActionPerformed
+
+    private void equipButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equipButton2ActionPerformed
+        equipCharacterToSlot(1);
+    }//GEN-LAST:event_equipButton2ActionPerformed
+
+    private void equipButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_equipButton3ActionPerformed
+        equipCharacterToSlot(2);
+    }//GEN-LAST:event_equipButton3ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -304,7 +375,9 @@ public class InventoryWin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton equipButton;
+    private javax.swing.JButton equipButton1;
+    private javax.swing.JButton equipButton2;
+    private javax.swing.JButton equipButton3;
     private javax.swing.JTable equippedList;
     private javax.swing.JButton goToLobby;
     private javax.swing.JButton goToShop;

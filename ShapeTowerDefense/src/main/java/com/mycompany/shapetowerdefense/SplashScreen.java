@@ -4,6 +4,9 @@
  */
 package com.mycompany.shapetowerdefense;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import javax.swing.JOptionPane;
 
 /**
@@ -19,6 +22,33 @@ public class SplashScreen extends javax.swing.JFrame {
         initComponents();
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        int midY = getHeight() / 2 + 50; // middle Y of screen 
+
+        // Circle
+        g2d.setColor(Color.RED);
+        g2d.fillOval(190, midY - 40, 70, 50);
+
+        // square
+        g2d.setColor(Color.GREEN);
+        g2d.translate(180 + 25, midY + 60); // center of square
+        g2d.rotate(50); // rotate based on time
+        g2d.fillRect(-25, -25, 50, 50);
+        g2d.rotate(50);
+        g2d.translate(-(180 + 25), -(midY + 25)); // reset
+
+        // Triangle
+        g2d.setColor(Color.BLUE);
+        int[] xPoints = {280, 305, 330};
+        int[] yPoints = {midY + 50, midY, midY + 50};
+        g2d.fillPolygon(xPoints, yPoints, 3);
+
+        g2d.dispose();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,12 +66,12 @@ public class SplashScreen extends javax.swing.JFrame {
         instructionsButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Shape Tower Defense");
 
-        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel1.setBackground(new java.awt.Color(153, 204, 255));
 
-        createAccountButton.setBackground(new java.awt.Color(0, 153, 153));
-        createAccountButton.setFont(new java.awt.Font("SimSun", 0, 12)); // NOI18N
-        createAccountButton.setForeground(new java.awt.Color(255, 255, 255));
+        createAccountButton.setBackground(new java.awt.Color(255, 204, 153));
+        createAccountButton.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
         createAccountButton.setText("Create Account");
         createAccountButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -49,9 +79,8 @@ public class SplashScreen extends javax.swing.JFrame {
             }
         });
 
-        logInButton.setBackground(new java.awt.Color(0, 153, 153));
-        logInButton.setFont(new java.awt.Font("SimSun", 0, 12)); // NOI18N
-        logInButton.setForeground(new java.awt.Color(255, 255, 255));
+        logInButton.setBackground(new java.awt.Color(255, 204, 153));
+        logInButton.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
         logInButton.setText("Log In");
         logInButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -84,9 +113,8 @@ public class SplashScreen extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        instructionsButton.setBackground(new java.awt.Color(0, 153, 153));
-        instructionsButton.setFont(new java.awt.Font("SimSun", 0, 12)); // NOI18N
-        instructionsButton.setForeground(new java.awt.Color(255, 255, 255));
+        instructionsButton.setBackground(new java.awt.Color(255, 204, 153));
+        instructionsButton.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
         instructionsButton.setText("Instructions");
         instructionsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
