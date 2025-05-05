@@ -11,18 +11,11 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 // Singleton Approach
-// Main has access to DataManager which means every class can use Main.DataManager to access anything
+// Main has access to DataManager which means every class can access anything
 // TODO:::::::::::::::::::::::::
-// add highscore api // confused
-// change drawing polygon code to my own
-// fix message title
-// fix screens titles
-// fix so I cant type or resize anything
-// fix the bug that constantly tells me I have no third character equipped
-// make battleWin dialog not pop up
-// weird code in shopWin
-
-// change text color in shop to brighten game up 
+// possibly add variations of enemies that spawn
+// background images
+// sprites
 // :::::::::::::::::::::::::::::
 public class DataManager implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -34,7 +27,7 @@ public class DataManager implements Serializable {
     public int highestWave;
     private ArrayList<ShapeCharacter> equippedUnits;
     private int UnitsCount = 0;
-    private ArrayList<ShapeCharacter> inventoryUnits; 
+    private ArrayList<ShapeCharacter> inventoryUnits;     
 
     public DataManager() {
         gold = 100;
@@ -88,7 +81,6 @@ public class DataManager implements Serializable {
     }
 
     // Food Generation 
-    
     public double getFoodGenerationMultiplier() {
         return foodGenerationMultiplier;
     }
@@ -113,7 +105,7 @@ public class DataManager implements Serializable {
         saveToFile(currentFilePath);
     }
 
-    // Getters and setters
+    // Gold
     public int getGold() {
         return gold;
     }
@@ -122,6 +114,7 @@ public class DataManager implements Serializable {
         this.gold = gold;
     }
 
+    // Waves
     public int getHighestWave() {
         return highestWave;
     }
@@ -131,6 +124,7 @@ public class DataManager implements Serializable {
         saveToFile(currentFilePath);
     }
 
+    // ShapeCharacter
     public ShapeCharacter getCharacterByName(String name) {
         for (ShapeCharacter sc : inventoryUnits) {
             if (sc.getShapeType().equals(name)) {
@@ -140,6 +134,7 @@ public class DataManager implements Serializable {
         return null;
     }
     
+    // Username
     public String getUsername() { 
         return currentUsername;
     }
@@ -148,18 +143,24 @@ public class DataManager implements Serializable {
         this.currentUsername = username;
     }
 
+    // Saves the current DataManager state to a file using object serialization
     public void saveToFile(String filePath) {
         if (filePath == null) return;
 
         FileOutputStream fileOut = null;
         ObjectOutputStream out = null;
         try {
+            // Create file output streams for writing the object
             fileOut = new FileOutputStream(filePath);
             out = new ObjectOutputStream(fileOut);
+
+            // Serialize 'this' object and write it to file
             out.writeObject(this);
         } catch (IOException e) {
+            // Show error dialog if saving fails
             JOptionPane.showMessageDialog(null, "Failed to save game", "Error", JOptionPane.ERROR_MESSAGE);
         } finally {
+            // Safely close streams
             try {
                 if (out != null) out.close();
                 if (fileOut != null) fileOut.close();
@@ -169,8 +170,11 @@ public class DataManager implements Serializable {
         }
     }
 
+    // Loads a DataManager object from a file
     private static DataManager loadFromFile(String filePath) {
         File file = new File(filePath);
+
+        // Return null if file doesn't exist
         if (!file.exists() || file.length() == 0) {
             return null;
         }
@@ -178,12 +182,17 @@ public class DataManager implements Serializable {
         FileInputStream fileIn = null;
         ObjectInputStream in = null;
         try {
+            // Create input streams to read object from file
             fileIn = new FileInputStream(file);
             in = new ObjectInputStream(fileIn);
+
+            // Deserialize and return the DataManager object
             return (DataManager) in.readObject();
         } catch (Exception e) {
+            // Return null if loading fails
             return null;
         } finally {
+            // Safely close streams
             try {
                 if (in != null) in.close();
                 if (fileIn != null) fileIn.close();
@@ -193,28 +202,31 @@ public class DataManager implements Serializable {
         }
     }
 
-
-
+    // Logs in the user by loading or initializing their DataManager file
     public void login(String username) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username cannot be empty");
         }
 
+        // Construct the file path for this user
         currentFilePath = username + "_data.dat";
         File file = new File(currentFilePath);
 
+        // If user has saved data, load it
         if (file.exists() && file.length() > 0) {
             DataManager loadedData = loadFromFile(currentFilePath);
             if (loadedData != null) {
-                this.copyFrom(loadedData);
+                this.copyFrom(loadedData); // Copy values from loaded data
             }
         }
 
+        // Set username, save current state, and open the lobby screen
         this.setUsername(username);
         this.saveToFile(currentFilePath);
         new LobbyWin().setVisible(true);
     }
 
+    // Copies all relevant fields from another DataManager instance
     private void copyFrom(DataManager source) {
         this.gold = source.gold;
         this.highestWave = source.highestWave;
@@ -223,4 +235,15 @@ public class DataManager implements Serializable {
         this.foodGenerationMultiplier = source.foodGenerationMultiplier;
         this.UnitsCount = source.UnitsCount;
     }
+    
+    public void refreshEquippedUnits() {
+        // Just reload from the save file, replacing current in-memory data
+        if (currentFilePath != null) {
+            DataManager loaded = loadFromFile(currentFilePath);
+            if (loaded != null) {
+                this.copyFrom(loaded);
+            }
+        }
+    }
+
 }

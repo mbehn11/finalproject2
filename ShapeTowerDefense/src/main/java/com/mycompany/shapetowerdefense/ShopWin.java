@@ -25,17 +25,17 @@ public class ShopWin extends javax.swing.JFrame {
         initComponents();
         allCharacters = ShapeCharacter.getAllShapes();
         random = new Random();
-        updateCoinsLabel();
+        updateLabels();
     }
 
     private void buyCharacter() {
-        // 1. Spend gold first
+        // Spend gold first
         if (!dm.spendGold(50)) {
-            JOptionPane.showMessageDialog(this, "Not enough coins!");
+            JOptionPane.showMessageDialog(this, "Not enough coins!", "Warning", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        // 2. Roll for rarity (unchanged)
+        // Roll for rarity (0-100)
         int roll = random.nextInt(100);
         String selectedRarity;
         if (roll < 40) {
@@ -52,16 +52,17 @@ public class ShopWin extends javax.swing.JFrame {
             selectedRarity = "Mythic";
         }
 
-        // 3. Get random character of that rarity
+        // Get random character of that rarity
         ArrayList<ShapeCharacter> filtered = new ArrayList<>();
         for (ShapeCharacter character : allCharacters) {
             if (character.getRarity().equalsIgnoreCase(selectedRarity)) {
                 filtered.add(character);
             }
         }
+
         ShapeCharacter newCharacter = filtered.get(random.nextInt(filtered.size()));
 
-        // 4. Check for duplicates against DataManager's ACTUAL inventory
+        // Check for duplicates against DataManager's inventory
         boolean isDuplicate = false;
         for (ShapeCharacter owned : dm.getInventoryUnits()) {
             if (owned.getShapeType().equals(newCharacter.getShapeType())) {
@@ -86,17 +87,17 @@ public class ShopWin extends javax.swing.JFrame {
                     JOptionPane.INFORMATION_MESSAGE);
 
             // Update display
-            rarietyLabel.setText("Rarity: " + newCharacter.getRarity());
+            rarityLabel.setText("Rarity: " + newCharacter.getRarity());
             nameLabel.setText("Name: " + newCharacter.getShapeType());
             healthLabel.setText("Health: " + newCharacter.getHealth());
             damageLabel.setText("Damage: " + newCharacter.getDamage());
         }
 
-        updateCoinsLabel();
+        updateLabels();
     }
 
     private void upgradeFoodGeneration() {
-        int upgradeCost = 125; // Set upgrade cost
+        int upgradeCost = 200; // Set upgrade cost
 
         if (!dm.spendGold(upgradeCost)) {
             JOptionPane.showMessageDialog(this, "Not enough coins!","Warning",
@@ -104,15 +105,16 @@ public class ShopWin extends javax.swing.JFrame {
             return;
         }
 
-        double upgradeAmount = 0.5; // Set upgrade amount
+        double upgradeAmount = 1; // Set upgrade amount
         dm.upgradeFoodGenerationMultiplier(upgradeAmount);
 
         generationLabel.setText("Generation Multiplier: " + dm.getFoodGenerationMultiplier());
-        updateCoinsLabel();
+        updateLabels();
     }
 
-    private void updateCoinsLabel() {
+    private void updateLabels() {
         goldLabel.setText("💰Coins: " + dm.getGold());
+        generationLabel.setText("Generation Multiplier: " + dm.getFoodGenerationMultiplier());
     }
     
     /**
@@ -124,26 +126,26 @@ public class ShopWin extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        UiPanel = new javax.swing.JPanel();
         buyButton = new javax.swing.JButton();
         upgradeFoodButton = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        data1Panel = new javax.swing.JPanel();
         toInventoryButton = new javax.swing.JButton();
         goldLabel = new javax.swing.JLabel();
         toLobbyButton = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        rarietyLabel = new javax.swing.JLabel();
+        data2Panel = new javax.swing.JPanel();
+        rarityLabel = new javax.swing.JLabel();
         nameLabel = new javax.swing.JLabel();
         healthLabel = new javax.swing.JLabel();
         damageLabel = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
+        data3Panel = new javax.swing.JPanel();
         generationLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Shop");
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(0, 153, 204));
+        UiPanel.setBackground(new java.awt.Color(0, 153, 204));
 
         buyButton.setBackground(new java.awt.Color(255, 204, 153));
         buyButton.setForeground(new java.awt.Color(255, 0, 0));
@@ -156,15 +158,15 @@ public class ShopWin extends javax.swing.JFrame {
 
         upgradeFoodButton.setBackground(new java.awt.Color(255, 204, 153));
         upgradeFoodButton.setForeground(new java.awt.Color(255, 51, 51));
-        upgradeFoodButton.setText("💰Upgrade Food Generation(125)");
+        upgradeFoodButton.setText("💰Upgrade Food Generation(200)");
         upgradeFoodButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 upgradeFoodButtonActionPerformed(evt);
             }
         });
 
-        jPanel2.setBackground(new java.awt.Color(153, 204, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 255, 0), new java.awt.Color(0, 204, 255), new java.awt.Color(255, 0, 255), new java.awt.Color(255, 0, 0)));
+        data1Panel.setBackground(new java.awt.Color(153, 204, 255));
+        data1Panel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 255, 0), new java.awt.Color(0, 204, 255), new java.awt.Color(255, 0, 255), new java.awt.Color(255, 0, 0)));
 
         toInventoryButton.setBackground(new java.awt.Color(255, 204, 153));
         toInventoryButton.setText("📦Inventory");
@@ -186,14 +188,14 @@ public class ShopWin extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout data1PanelLayout = new javax.swing.GroupLayout(data1Panel);
+        data1Panel.setLayout(data1PanelLayout);
+        data1PanelLayout.setHorizontalGroup(
+            data1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data1PanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(data1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(data1PanelLayout.createSequentialGroup()
                         .addComponent(toInventoryButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(toLobbyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -201,11 +203,11 @@ public class ShopWin extends javax.swing.JFrame {
                     .addComponent(goldLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        data1PanelLayout.setVerticalGroup(
+            data1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data1PanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(data1PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(toInventoryButton)
                     .addComponent(toLobbyButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -213,12 +215,12 @@ public class ShopWin extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3.setBackground(new java.awt.Color(153, 204, 255));
-        jPanel3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(51, 51, 255), new java.awt.Color(255, 0, 204), new java.awt.Color(0, 204, 204), new java.awt.Color(0, 153, 204)));
+        data2Panel.setBackground(new java.awt.Color(153, 204, 255));
+        data2Panel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(51, 51, 255), new java.awt.Color(255, 0, 204), new java.awt.Color(0, 204, 204), new java.awt.Color(0, 153, 204)));
 
-        rarietyLabel.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
-        rarietyLabel.setForeground(new java.awt.Color(255, 0, 255));
-        rarietyLabel.setText("Rariety:");
+        rarityLabel.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
+        rarityLabel.setForeground(new java.awt.Color(255, 0, 255));
+        rarityLabel.setText("Rarity");
 
         nameLabel.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
         nameLabel.setForeground(new java.awt.Color(51, 51, 255));
@@ -232,24 +234,24 @@ public class ShopWin extends javax.swing.JFrame {
         damageLabel.setForeground(new java.awt.Color(0, 255, 255));
         damageLabel.setText("Damage:");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout data2PanelLayout = new javax.swing.GroupLayout(data2Panel);
+        data2Panel.setLayout(data2PanelLayout);
+        data2PanelLayout.setHorizontalGroup(
+            data2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data2PanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(rarietyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(data2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rarityLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(healthLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(damageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        data2PanelLayout.setVerticalGroup(
+            data2PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data2PanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(rarietyLabel)
+                .addComponent(rarityLabel)
                 .addGap(12, 12, 12)
                 .addComponent(nameLabel)
                 .addGap(12, 12, 12)
@@ -259,64 +261,64 @@ public class ShopWin extends javax.swing.JFrame {
                 .addContainerGap(47, Short.MAX_VALUE))
         );
 
-        jPanel4.setBackground(new java.awt.Color(153, 204, 255));
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 102, 102), new java.awt.Color(255, 0, 0), new java.awt.Color(255, 204, 0), new java.awt.Color(255, 102, 204)));
+        data3Panel.setBackground(new java.awt.Color(153, 204, 255));
+        data3Panel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 102, 102), new java.awt.Color(255, 0, 0), new java.awt.Color(255, 204, 0), new java.awt.Color(255, 102, 204)));
 
         generationLabel.setFont(new java.awt.Font("Snap ITC", 0, 12)); // NOI18N
         generationLabel.setForeground(new java.awt.Color(255, 0, 51));
         generationLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         generationLabel.setText("Generation Multiplier:");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout data3PanelLayout = new javax.swing.GroupLayout(data3Panel);
+        data3Panel.setLayout(data3PanelLayout);
+        data3PanelLayout.setHorizontalGroup(
+            data3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data3PanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(generationLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        data3PanelLayout.setVerticalGroup(
+            data3PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(data3PanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(generationLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout UiPanelLayout = new javax.swing.GroupLayout(UiPanel);
+        UiPanel.setLayout(UiPanelLayout);
+        UiPanelLayout.setHorizontalGroup(
+            UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(UiPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UiPanelLayout.createSequentialGroup()
+                        .addGroup(UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(UiPanelLayout.createSequentialGroup()
+                                .addComponent(data2Panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 2, Short.MAX_VALUE))
                             .addComponent(buyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(upgradeFoodButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(data3Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(data1Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+        UiPanelLayout.setVerticalGroup(
+            UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, UiPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(data1Panel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(buyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(upgradeFoodButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(UiPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(data3Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(data2Panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -324,11 +326,11 @@ public class ShopWin extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(UiPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(UiPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -389,17 +391,17 @@ public class ShopWin extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel UiPanel;
     private javax.swing.JButton buyButton;
     private javax.swing.JLabel damageLabel;
+    private javax.swing.JPanel data1Panel;
+    private javax.swing.JPanel data2Panel;
+    private javax.swing.JPanel data3Panel;
     private javax.swing.JLabel generationLabel;
     private javax.swing.JLabel goldLabel;
     private javax.swing.JLabel healthLabel;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel nameLabel;
-    private javax.swing.JLabel rarietyLabel;
+    private javax.swing.JLabel rarityLabel;
     private javax.swing.JButton toInventoryButton;
     private javax.swing.JButton toLobbyButton;
     private javax.swing.JButton upgradeFoodButton;

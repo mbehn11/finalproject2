@@ -14,7 +14,7 @@ public abstract class Unit implements Serializable {
     protected int damage;
     protected int speed;
     protected int width, height;
-    protected String shapeType; // "Circle", "Square", "Rectangle"
+    protected String shapeType; // "Circle", "Square", "Rectangle" etc
 
     public Unit(int x, int y, int health, int damage, int speed, int width, int height, String shapeType) {
         this.x = x;

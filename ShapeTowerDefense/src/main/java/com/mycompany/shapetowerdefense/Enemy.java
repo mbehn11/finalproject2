@@ -16,7 +16,7 @@ public class Enemy extends Unit {
 
     @Override
     public void moveForward() {
-        x -= speed;
+        x -= speed; // moves left
     }
 }
 
